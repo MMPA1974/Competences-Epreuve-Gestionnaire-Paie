@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Compétences</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        /* Light Mode */
+        body[data-theme="light"] {
+            background-color: #f3f4f6;
+            color: #333;
+        }
+        body[data-theme="light"] .container {
+            background-color: #fcfbf8; /* Crème douce */
+        }
+        body[data-theme="light"] .block-summary {
+            background-color: #f9fafb;
+            border-bottom-color: #e5e7eb;
+        }
+        body[data-theme="light"] .skill-item:hover {
+            background-color: #f3f4f6;
+        }
+        body[data-theme="light"] .text-gray-700 {
+            color: #4b5563;
+        }
+        /* Light Mode - Control Buttons vibrant colors */
+        body[data-theme="light"] #theme-toggle { background-color: #EC4899; } /* Fuchsia-500 */
+        body[data-theme="light"] #theme-toggle:hover { background-color: #DB2777; } /* Fuchsia-600 */
+        body[data-theme="light"] #sound-toggle { background-color: #F97316; } /* Orange-500 */
+        body[data-theme="light"] #sound-toggle:hover { background-color: #EA580C; } /* Orange-600 */
+        body[data-theme="light"] #print-button { background-color: #3B82F6; } /* Blue-500 */
+        body[data-theme="light"] #print-button:hover { background-color: #2563EB; } /* Blue-600 */
+        body[data-theme="light"] .whatsapp-button { background-color: #25D366; } /* WhatsApp Green */
+        body[data-theme="light"] .whatsapp-button:hover { background-color: #1DA851; }
+        body[data-theme="light"] .discord-button { background-color: #7289DA; } /* Discord Purple */
+        body[data-theme="light"] .discord-button:hover { background-color: #5B6FB3; }
+        /* Light Mode - Alert Box specific colors */
+        body[data-theme="light"] .alert-box {
+            background-color: #fef3c7;
+            border-color: #fbbf24;
+            color: #a16207;
+        }
+        body[data-theme="light"] .alert-box .font-semibold {
+            color: #78350f;
+        }
+
+
+        /* Dark Mode */
+        body[data-theme="dark"] {
+            background-color: #0d1a2d; /* Bleu nuit premium */
+            color: #e2e8f0;
+        }
+        body[data-theme="dark"] .container {
+            background-color: #1F2937; /* Bleu-gris foncé (slate-800) */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        body[data-theme="dark"] .block-summary {
+            background-color: #2d3748;
+            border-bottom-color: #4a5568;
+        }
+        body[data-theme="dark"] .skill-item {
+            border-bottom-color: #4a5568;
+        }
+        body[data-theme="dark"] .skill-item:hover {
+            background-color: #2d3748;
+        }
+        body[data-theme="dark"] .text-gray-700 {
+            color: #cbd5e0;
+        }
+        body[data-theme="dark"] .text-gray-900 {
+            color: #f7fafc;
+        }
+        /* Dark Mode - Control Buttons colors (darker shades for harmony) */
+        body[data-theme="dark"] #theme-toggle { background-color: #C026D3; } /* Purple-600 (vibrant fuchsia) */
+        body[data-theme="dark"] #theme-toggle:hover { background-color: #A21CAF; } /* Purple-700 */
+        body[data-theme="dark"] #sound-toggle { background-color: #F59E0B; } /* Amber-500 (brighter orange) */
+        body[data-theme="dark"] #sound-toggle:hover { background-color: #D97706; } /* Amber-600 */
+        body[data-theme="dark"] #print-button { background-color: #60A5FA; } /* Blue-400 (brighter blue) */
+        body[data-theme="dark"] #print-button:hover { background-color: #3B82F6; } /* Blue-500 */
+        body[data-theme="dark"] .whatsapp-button { background-color: #22C55E; } /* Green-500 (vibrant green) */
+        body[data-theme="dark"] .whatsapp-button:hover { background-color: #16A34A; } /* Green-600 */
+        body[data-theme="dark"] .discord-button { background-color: #8B5CF6; } /* Violet-500 (vibrant purple) */
+        body[data-theme="dark"] .discord-button:hover { background-color: #7C3AED; } /* Violet-600 */
+        /* Dark Mode - Alert Box specific colors */
+        body[data-theme="dark"] .alert-box {
+            background-color: #7c2d12;
+            border-color: #f97316;
+            color: #ffedd5;
+        }
+        body[data-theme="dark"] .alert-box .font-semibold {
+            color: #fff7ed;
+        }
+
+
+        .container {
+            max-width: 960px;
+            width: 100%;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        /* Accordion specific styles */
+        details {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        body[data-theme="dark"] details {
+            border-color: #4a5568;
+            background-color: #1F2937;
+        }
+
+        summary {
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary::marker {
+            display: none;
+        }
+
+        summary::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.2s ease-in-out;
+            margin-left: 1rem;
+            color: inherit;
+        }
+
+        details[open] > summary::after {
+            content: '▲';
+        }
+
+
+        .block-content {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            transition: all 0.3s ease-in-out;
+        }
+        body[data-theme="dark"] .block-content {
+            border-top-color: #4a5568;
+        }
+
+        /* Block-specific colors for summary */
+        .block-pink {
+            background-color: #fce7f3;
+            color: #be185d;
+        }
+        .block-orange {
+            background-color: #fff7ed;
+            color: #ea580c;
+        }
+        .block-yellow {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+
+        /* General styles for skill items, progress, etc. */
+        .skill-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.75rem;
+            transition: background-color 0.2s ease-in-out, border-color 0.3s ease-in-out;
+        }
+        .skill-item:last-child {
+            border-bottom: none;
+        }
+        .skill-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            min-width: 1rem;
+            min-height: 1rem;
+            cursor: pointer;
+        }
+        .skill-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+        .progress-bar-container {
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 0.75rem;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #22c55e;
+            width: 0%;
+            border-radius: 9999px;
+            transition: width 0.3s ease-out;
+        }
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        /* Base control button style */
+        .control-button {
+            padding: 0.75rem 1.25rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none; /* Remove underline for links */
+        }
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .control-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Specific button shapes */
+        .control-button.rounded-pill {
+            border-radius: 9999px;
+        }
+        .control-button.rounded-rect {
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+
+        /* Skill details */
+        .skill-details {
+            margin-top: 0.75rem;
+            padding: 1rem;
+            border-top: 1px dashed #e5e7eb;
+            background-color: #fefcbf;
+            border-radius: 0.5rem;
+            animation: fadeIn 0.3s ease-out;
+            width: 100%;
+        }
+        body[data-theme="dark"] .skill-details {
+            background-color: #334155;
+            border-top-color: #555;
+            color: #f7fafc;
+        }
+        body[data-theme="dark"] .skill-details label {
+            color: #f7fafc;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .details-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            margin-left: auto;
+            line-height: 1;
+            align-self: flex-start;
+            margin-top: 0.15rem;
+            color: #6366f1;
+            transition: transform 0.2s ease;
+        }
+        .details-toggle:hover {
+            transform: scale(1.1);
+        }
+        .details-toggle.active {
+            transform: rotate(90deg);
+        }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .course-item input[type="checkbox"] {
+            margin-top: 0;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body > *:not(.container) {
+                display: none !important;
+            }
+            .control-buttons, #reset-button, .alert-box, .external-links {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: none !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            details {
+                display: block !important;
+                page-break-after: always;
+                border: none !important;
+                box-shadow: none !important;
+                background-color: transparent !important;
+            }
+            details[open] > summary::after {
+                content: '' !important;
+            }
+            details summary {
+                border-radius: 0 !important;
+                background-color: transparent !important;
+                color: #000 !important;
+                border-bottom: 1px solid #ccc !important;
+            }
+            details .block-content {
+                border-top: none !important;
+                padding: 1rem 0 !important;
+            }
+            details:last-child {
+                page-break-after: auto;
+            }
+            .skill-details.hidden {
+                display: block !important;
+            }
+            .details-toggle {
+                display: none !important;
+            }
+            /* Ensure the text is readable and black on print */
+            body, .block-summary, .skill-item, .skill-details, .course-item label {
+                color: #000 !important;
+                background-color: #fff !important;
+                border-color: #ccc !important;
+            }
+            .progress-bar-container, .progress-bar {
+                background-color: #e0e0e0 !important;
+            }
+            .course-item input[type="checkbox"] {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800" data-theme="light">
+    <div class="container shadow-lg rounded-xl overflow-hidden p-6 md:p-8">
+
+        <div class="control-buttons">
+            <button id="theme-toggle" class="control-button rounded-pill">
+                <span id="theme-icon">☀️</span>
+                <span id="theme-text">Mode Nuit</span>
+            </button>
+            <button id="sound-toggle" class="control-button rounded-pill">
+                <span id="sound-icon">🔊</span>
+                <span id="sound-text">Son ON</span>
+            </button>
+            <a href="https://chat.whatsapp.com/EtV0ux5ipAG5JDhopzo0ut" target="_blank" rel="noopener noreferrer" class="control-button whatsapp-button rounded-rect">
+                <span>💬</span>
+                <span>WhatsApp</span>
+            </a>
+            <a href="https://discord.com/invite/cBnBkGDFgk" target="_blank" rel="noopener noreferrer" class="control-button discord-button rounded-rect">
+                <span>🎮</span>
+                <span>Discord</span>
+            </a>
+            <button id="print-button" class="control-button rounded-pill">
+                <span>🖨️</span>
+                <span>Imprimer</span>
+            </button>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6 text-gray-900">
+            Suivi des Compétences de l'Épreuve ✨
+        </h1>
+
+        <div class="alert-box text-center border-l-4 p-4 rounded-lg mb-8 shadow-md" role="alert">
+            <p class="font-bold text-lg">RAPPEL IMPORTANT :</p>
+            <p class="mt-2 text-base">La <span class="font-semibold">gestion du temps</span> est la clé de votre succès ! Cochez chaque compétence au fur et à mesure. N'oubliez pas de bien **traiter** chaque point ! 🚀</p>
+        </div>
+
+        <!-- Block 1 -->
+        <details class="block-accordion" data-block="block1" open>
+            <summary class="block-summary block-pink">
+                <span>Bloc 1: Gérer la paie et les déclarations sociales (10h) 📊</span>
+                <span id="progress-text-block1" class="font-semibold text-sm">0/5 compétences traitées (0%)</span>
+            </summary>
+            <div class="block-content">
+                <div class="progress-bar-container">
+                    <div id="progress-bar-block1" class="progress-bar"></div>
+                </div>
+                <div class="mt-4">
+                    <div class="skill-item" data-skill-id="c1-1">
+                        <input type="checkbox" id="c1-1" class="form-checkbox h-5 w-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer">
+                        <label for="c1-1" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C1.1:</span> Paramétrer le logiciel de paie (éléments d'identification, infos collaborateurs, éléments fixes, cotisations et taux).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c1-2">
+                        <input type="checkbox" id="c1-2" class="form-checkbox h-5 w-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer">
+                        <label for="c1-2" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C1.2:</span> Collecter et traiter les éléments de rémunération variable (primes, absences, HS, avantages en nature, indemnités de rupture).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c1-3">
+                        <input type="checkbox" id="c1-3" class="form-checkbox h-5 w-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer">
+                        <label for="c1-3" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C1.3:</span> Contrôler et éditer les bulletins de paie (spécificités entreprise, montants cotisations, net imposable, net à payer, anomalies).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c1-4">
+                        <input type="checkbox" id="c1-4" class="form-checkbox h-5 w-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer">
+                        <label for="c1-4" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C1.4:</span> Réaliser les déclarations sociales nominatives (écarts journal/DSN, cotisations mensuelles/annuelles, anomalies bloquantes).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c1-5">
+                        <input type="checkbox" id="c1-5" class="form-checkbox h-5 w-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer">
+                        <label for="c1-5" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C1.5:</span> Identifier et analyser les écarts paie/comptabilité (rapprochement, causes, risques juridiques, actions correctrices).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <!-- Block 2 -->
+        <details class="block-accordion" data-block="block2">
+            <summary class="block-summary block-orange">
+                <span>Bloc 2: Assurer la gestion administrative du personnel (8h) 📋</span>
+                <span id="progress-text-block2" class="font-semibold text-sm">0/4 compétences traitées (0%)</span>
+            </summary>
+            <div class="block-content">
+                <div class="progress-bar-container">
+                    <div id="progress-bar-block2" class="progress-bar"></div>
+                </div>
+                <div class="mt-4">
+                    <div class="skill-item" data-skill-id="c2-1">
+                        <input type="checkbox" id="c2-1" class="form-checkbox h-5 w-5 text-orange-600 rounded focus:ring-orange-500 cursor-pointer">
+                        <label for="c2-1" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C2.1:</span> Établir les contrats de travail (clauses minimales, obligatoires, spécifiques, conformité Code du Travail/CCN).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c2-2">
+                        <input type="checkbox" id="c2-2" class="form-checkbox h-5 w-5 text-orange-600 rounded focus:ring-orange-500 cursor-pointer">
+                        <label for="c2-2" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C2.2:</span> Réaliser les formalités embauche/départ (DPAE, RUP, calcul indemnités rupture/CP, documents obligatoires).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c2-3">
+                        <input type="checkbox" id="c2-3" class="form-checkbox h-5 w-5 text-orange-600 rounded focus:ring-orange-500 cursor-pointer">
+                        <label for="c2-3" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C2.3:</span> Constituer et tenir à jour dossiers personnel (documents essentiels, manquements, RGPD, infos sensibles).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c2-4">
+                        <input type="checkbox" id="c2-4" class="form-checkbox h-5 w-5 text-orange-600 rounded focus:ring-orange-500 cursor-pointer">
+                        <label for="c2-4" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C2.4:</span> Communiquer avec partenaires externes (Médecine du travail, Inspection du travail, DUERP, dérogations repos dominical).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <!-- Block 3 -->
+        <details class="block-accordion" data-block="block3">
+            <summary class="block-summary block-yellow">
+                <span>Bloc 3: Conseiller et assister les décideurs et les collaborateurs (10h) 🤝</span>
+                <span id="progress-text-block3" class="font-semibold text-sm">0/5 compétences traitées (0%)</span>
+            </summary>
+            <div class="block-content">
+                <div class="progress-bar-container">
+                    <div id="progress-bar-block3" class="progress-bar"></div>
+                </div>
+                <div class="mt-4">
+                    <div class="skill-item" data-skill-id="c3-1">
+                        <input type="checkbox" id="c3-1" class="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer">
+                        <label for="c3-1" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C3.1:</span> Réaliser une veille juridique (rapport de veille, applicabilité, formalisation/diffusion, méthodologie).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c3-2">
+                        <input type="checkbox" id="c3-2" class="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer">
+                        <label for="c3-2" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C3.2:</span> Diagnostiquer la conformité de la paie (minimas conventionnels, avantages en nature, régularisations, risques juridiques).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c3-3">
+                        <input type="checkbox" id="c3-3" class="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer">
+                        <label for="c3-3" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C3.3:</span> Communiquer avec collaborateurs/managers (pédagogie, adaptation communication, handicap, références juridiques).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c3-4">
+                        <input type="checkbox" id="c3-4" class="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer">
+                        <label for="c3-4" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C3.4:</span> Concevoir supports reporting/aide décision (EMA, turnover, masse salariale, absentéisme, Excel, analyse).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="skill-item" data-skill-id="c3-5">
+                        <input type="checkbox" id="c3-5" class="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500 cursor-pointer">
+                        <label for="c3-5" class="text-gray-700 text-base flex-1 cursor-pointer">
+                            <span class="font-medium">Compétence C3.5:</span> Assister utilisateurs SIRH (mode opératoire, public cible, accessibilité, pédagogie).
+                        </label>
+                        <button class="details-toggle">➡️</button>
+                        <div class="skill-details hidden w-full p-4 mt-2 rounded-lg text-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <div class="text-center mt-8">
+            <button id="reset-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75">
+                Réinitialiser Tout 🔄
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            const soundToggle = document.getElementById('sound-toggle');
+            const soundIcon = document.getElementById('sound-icon');
+            const soundText = document.getElementById('sound-text');
+            const printButton = document.getElementById('print-button');
+            const body = document.body;
+
+            let isSoundOn = localStorage.getItem('isSoundOn') === 'true'; // Load sound state
+            let audioContext;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.warn('Web Audio API non supporté dans ce navigateur.');
+            }
+
+            const blocks = {
+                block1: { total: 5, checked: 0, progressBar: document.getElementById('progress-bar-block1'), progressText: document.getElementById('progress-text-block1') },
+                block2: { total: 4, checked: 0, progressBar: document.getElementById('progress-bar-block2'), progressText: document.getElementById('progress-text-block2') },
+                block3: { total: 5, checked: 0, progressBar: document.getElementById('progress-bar-block3'), progressText: document.getElementById('progress-text-block3') }
+            };
+
+            // Data for courses (kept the same as previous versions)
+            const courseMapping = {
+                "c1-1": [
+                    "B1_M1_001_Télécharger le logiciel", "B1_M1_002_La base de données 2019", "B1_M1_003_Lancement de l'application", "B1_M1_004_Découverte de l'application", "B1_M1_005_La création d'une société", "B1_M1_006_Le paramétrage d'une société", "B1_M1_007_Le paramétrage de l'établissement", "B1_M1_008_La création des fiches salariés", "B1_M1_009_Le paramétrage des bulletins modèles", "B1_M1_010_Le paramétrage du salaire brut", "B1_M1_011_Le paramétrage des cotisations sociales", "B1_M1_012_Le paramétrage des salaires nets", "B1_M1_013_Les déclarations sociales", "B1_M1_014_Questions fréquentes", "B1_M1_015_L'Accès à d'autres logiciels de paie", "B1_M1_016_Synthèse et application : Paramétrer le logiciel de paie"
+                ],
+                "c1-2": [
+                    "B1_M2_001_Comment et pourquoi se former à la collecte et au calcul des variables de paie", "B1_M2_002_Présentation de la Gestion de la Paie", "B1_M2_003_La gestion de la paie (pour débutants)", "B1_M2_004_Le temps de travail", "B1_M2_005_La rémunération", "B1_M2_006_Application : Collecter et traiter les variables de paie", "B1_M3_001_La présentation et la méthodologie du bulletin de salaire", "B1_M3_002_Le règlement du salaire", "B1_M3_003_La rémunération brute : l'acquisition et la prise de congés payés", "B1_M3_004_La rémunération brute : l’indemnité de congés payés", "B1_M3_005_La rémunération brute : les heures complémentaires", "B1_M3_006_Présentation de la rémunération brute et de la durée légale du travail", "B1_M3_007_Présentation de la rémunération brute et le temps de travail effectif", "B1_M3_008_La rémunération brute : le salaire de base, les primes et la retenue pour absence", "B1_M3_009_La rémunération brute : les heures supplémentaires et le dimanche travaillé", "B1_M3_010_La rémunération brute : les heures supplémentaires", "B1_M3_011_La rémunération brute : les avantages en nature", "B1_M3_012_La rémunération brute : l’arrêt de travail, la retenue pour absence, la subrogation et les IJSS", "B1_M3_013_La rémunération brute : l’arrêt de travail et le complément employeur", "B1_M3_014_La grève et le lock-out", "B1_M4_001_Le bulletin de salaire d'un dirigeant sans contrat de travail", "B1_M4_002_L'activité partielle", "B1_M4_003_Le bulletin de salaire VRP", "B1_M4_004_Le bulletin de salaire du BTP (ouvrier)", "B1_M4_005_Le bulletin de salaire du BTP (ETAM et Cadres)", "B1_M4_006_Le bulletin de salaire Apprenti", "B1_M4_007_La gratification stagiaire", "B1_M4_008_Synthèse et application : Collecter et traiter les variables de paie"
+                ],
+                "c1-3": [
+                    "B1_M5_001_Les diverses cotisations sociales", "B1_M5_002_Les bases de calcul des cotisations sociales", "B1_M5_003_Les réductions de cotisations sociales", "B1_M5_004_Les régularisations de cotisations sociales", "B1_M5_005_Le salaire net et le salaire imposable", "B1_M5_006_Les impacts du prélèvement à la source", "B1_M5_007_Le salaire net à payer et le net social", "B1_M5_008_Synthèse et application : Contrôler et éditer les Bulletins de paie"
+                ],
+                "c1-4": [
+                    "B1_M6_001_Comment et pourquoi se former à l'édition et au contrôle des déclarations sociales", "B1_M6_002_Le livre de paie", "B1_M6_003_Les modalités déclaratives", "B1_M6_004_Le contenu des déclarations sociales : la réduction générale et TEPAB", "B1_M6_005_Le contenu des déclarations sociales : les cotisations, le PAS et les contributions sociales", "B1_M6_006_La gestion des arrêts de travail en paie", "B1_M6_007_La taxe d'apprentissage", "B1_M6_008_La gestion de la déclaration d'emploi des travailleurs handicapés", "B1_M6_009_Les taxes sur les salaires", "B1_M6_010_La participation à la formation continue", "B1_M6_011_L'investissement obligatoire dans la construction", "B1_M6_012_Synthèse et application : Gérer les déclarations sociales"
+                ],
+                "c1-5": [
+                    "B1_M7_001_Les enjeux de l'identification et l'analyse des écarts entre la paie et la comptabilité", "B1_M7_002_La présentation du plan comptable : généralités", "B1_M7_003_Le grand livre comptable et les données paie", "B1_M7_004_Les opérations comptables issues de la paie", "B1_M7_005_Comptabilisation de la paie", "B1_M7_006_L'analyse des causes", "B1_M7_007_L'analyse des risques", "B1_M7_008_Les opérations de régularisations", "B1_M7_009_Synthèse et application : Analyser les écarts entre la paie et la comptabilité"
+                ],
+                "c2-1": [
+                    "B2_M1_001_La notion de droit du travail", "B2_M1_002_La formation du contrat de travail", "B2_M1_003_Maîtriser la rédaction d’un contrat de travail", "B2_M1_004_L’exécution du contrat de travail", "B2_M1_005_Le contrat de travail à durée indéterminée", "B2_M1_006_Le CDD et le contrat de travail temporaire", "B2_M1_007_Le contrat de travail à temps partiel", "B2_M1_008_Les contrats de formation", "B2_M1_009_La rédaction du contrat de travail", "B2_M1_010_Synthèse et application : Etablir les contrats de travail"
+                ],
+                "c2-2": [
+                    "B2_M2_001_Comment et pourquoi se former à gestion des parcours salariés", "B2_M2_002_Le recrutement", "B2_M2_003_Les formalités administratives d'embauche", "B2_M2_004_La suspension du contrat de travail", "B2_M2_005_L'édition des documents de suspension du contrat", "B2_M2_006_La rupture du contrat de travail : introduction", "B2_M2_007_Le licenciement", "B2_M2_008_Les autres modes de rupture du contrat de travail", "B2_M2_009_Les fins de contrat : cas du CDD, ICP, Indemnité RTT, ...", "B2_M2_010_Les fins de contrat : rupture conventionnelle, départ et mise à la retraite", "B2_M2_011_Les formalités de rupture du contrat de travail", "B2_M2_012_L'édition des documents de fin de contrat", "B2_M2_013_Synthèse et application : Traiter les entrées et sorties des salariés"
+                ],
+                "c2-3": [
+                    "B2_M3_001_La stratégie globale de digitalisation de l'entreprise", "B2_M3_002_La transition numérique", "B2_M3_003_La digitalisation de la fonction RH", "B2_M3_004_La digitalisation des dossiers du personnel", "B2_M3_005_Le coffre fort numérique", "B2_M3_006_RGPD : Règlement Général de Protection des Données", "B2_M3_007_Synthèse et application : Gérer les dossiers du personnel"
+                ],
+                "c2-4": [
+                    "B2_M4_001_Les partenaires externes du service paie", "B2_M4_002_Les outils de communication du service paie avec ses partenaires", "B2_M4_003_Les contrôles de l’application du droit du travail", "B2_M4_004_Le contentieux de la relation de travail", "B2_M4_005_Les procédures de règlement des conflits collectifs", "B2_M4_006_Les contrôles et le contentieux social", "B2_M4_007_Le rôle et le contrôle de l'URSSAF", "B2_M4_008_Synthèse et application : Communiquer avec les partenaires externes"
+                ],
+                "c3-1": [
+                    "B3_M1_001_Le conseil et l'assistance à la direction et aux collaborateurs", "B3_M1_002_La démarche de veille", "B3_M1_003_La veille juridique", "B3_M1_004_Les différents types de veille", "B3_M1_005_La notion de droit du travail", "B3_M1_006_Les sources professionnelles du droit du travail", "B3_M1_007_La hiérarchie des sources du droit du travail", "B3_M1_008_La protection sociale, généralités", "B3_M1_009_La formation professionnelle", "B3_M1_010_Les pouvoirs de l’employeur et la protection de la santé des salariés", "B3_M1_011_Comment effectuer une veille active", "B3_M1_012_Le support de communication de la veille juridique", "B3_M1_013_Synthèse et application : Réaliser une veille juridique"
+                ],
+                "c3-2": [
+                    "B3_M2_001_L'analyse documentaire", "B3_M2_002_La collecte des informations auprès des décideurs", "B3_M2_003_L'identification des écarts", "B3_M2_004_L'identification des risques encourus", "B3_M2_005_Les actions correctrices", "B3_M2_006_Le rapport de diagnostic", "B3_M2_007_Synthèse et application : Diagnostiquer le conformité de la paie"
+                ],
+                "c3-3": [
+                    "B3_M3_001_Les fondamentaux de la communication professionnelle", "B3_M3_002_L'écoute active", "B3_M3_003_La communication non verbale", "B3_M3_004_Les fondamentaux de la prise de parole en public", "B3_M3_005_Les réunions à distances", "B3_M3_006_Rédiger une réponse professionnelle", "B3_M3_007_Les fondamentaux de la sécurité sociale", "B3_M3_008_L’assurance maladie du régime général", "B3_M3_009_L’assurance vieillesse du régime général", "B3_M3_010_La protection contre le chômage", "B3_M3_011_Synthèse et application : Communiquer avec les collaborateurs et managers"
+                ],
+                "c3-4": [
+                    "B3_M4_001_Les fondamentaux d'excel", "B3_M4_002_Le calcul des effectifs", "B3_M4_003_Le bilan social", "B3_M4_004_Le recueil préalable des informations RH", "B3_M4_005_L'édition des tableaux de bord sociaux", "B3_M4_006_L'analyse et le suivi des tableaux de bord sociaux", "B3_M4_007_L'analyse et la prévision de la masse salariale", "B3_M4_008_L’association des salariés aux performances de l’entreprise, généralités", "B3_M4_009_La participation", "B3_M4_010_L'intéressement", "B3_M4_011_Les plans d’épargne salariale", "B3_M4_012_Synthèse et application : Concevoir des supports de reporting et d’aide à la décision"
+                ],
+                "c3-5": [
+                    "B3_M5_001_L'utilisation d'un SIRH", "B3_M5_002_Les enjeux d'un SIRH", "B3_M5_003_Les fonctionnalités du SIRH", "B3_M5_004_La réglementation inhérente aux SIRH", "B3_M5_005_Introduction à la notion de base de données", "B3_M5_006_L'exploitation des bases de données", "B3_M5_007_L'utilisation du SIRH au quotidien par le collaborateur", "B3_M5_008_Proder Talentsoft ou cornerstone", "B3_M5_009_La rédaction des courriers à destination du personnel", "B3_M5_010_Synthèse et application : Assister les utilisateurs du SIRH"
+                ]
+            };
+
+            const foundationalCourses = [
+                "B0_M1_Maîtriser les notions mathématiques de base", "B0_M1_001_Rappels des règles de calcul numérique", "B0_M1_002_Le traitement d'une situation du 1er degré avec des séries proportionnelles", "B0_M1_003_Les pourcentages", "B0_M1_004_Retrouver le coefficient multiplicateur par calcul", "B0_M1_005_Le calcul d'une réduction et d'un prix réduit", "B0_M2_Acquérir les bases du droit social et de la gestion de la paie", "B0_M2_001_Droit social et veille sociale", "B0_M2_002_Présentation de la Gestion de la Paie", "B0_M3_Réaliser des écrits professionnels", "B0_M3_001_Etre à l'aise avec l'orthographe", "B0_M3_002_Savoir prendre des notes", "B0_M3_003_Communication externe écrite", "B0_M3_004_Communication interne écrite", "B0_M3_005_Les bonnes pratiques des écrits professionnels", "B0_M3_006_Le bon traitement de l'information", "B0_M3_007_L'utilisation de la messagerie Gmail de Google", "B0_M3_008_La note de service", "B0_M3_009_Le compte-rendu de réunion", "B0_M4_Transmettre des informations oralement", "B0_M4_001_Les techniques de communication", "B0_M4_002_Introduction à l'importance de la prise de parole", "B0_M4_003_Comprendre comment et quand parler", "B0_M4_004_Parler sans être intimidé", "B0_M5_Organiser son planning", "B0_M5_001_Comment planifier de manière optimale", "B0_M5_002_Plannings et outils de planification", "B0_M5_003_Construction d'un planning", "B0_M5_004_Les méthodes de planification digitales", "B0_M5_005_Points de vigilance de la planification", "B0_M5_006_La gestion du temps"
+            ];
+
+            /**
+             * Returns the full course name with its codification.
+             * @param {string} courseId - The full course ID.
+             * @returns {string} The course name with its codification.
+             */
+            const getFullCourseName = (courseId) => {
+                return courseId.replace(/_/g, ' ');
+            };
+
+
+            /**
+             * Plays a short click sound.
+             */
+            const playClickSound = () => {
+                if (!isSoundOn || !audioContext) return;
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(490, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.1);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            };
+
+            /**
+             * Calculates and updates the progress bar and text for a given block.
+             * @param {string} blockId - The ID of the block (e.g., 'block1').
+             */
+            const updateProgress = (blockId) => {
+                const block = blocks[blockId];
+                const checkedCount = Array.from(document.querySelectorAll(`details[data-block="${blockId}"] input[type="checkbox"]:checked`)).length;
+                block.checked = checkedCount;
+                const percentage = (checkedCount / block.total) * 100;
+
+                block.progressBar.style.width = `${percentage}%`;
+                block.progressText.textContent = `${checkedCount}/${block.total} compétences ${checkedCount <= 1 ? 'traitée' : 'traitées'} (${Math.round(percentage)}%)`;
+            };
+
+            /**
+             * Saves the current state of all checkboxes, theme, and sound to localStorage.
+             */
+            const saveState = () => {
+                const checkboxState = {};
+                checkboxes.forEach(checkbox => {
+                    checkboxState[checkbox.id] = checkbox.checked;
+                });
+                localStorage.setItem('skillTrackerState', JSON.stringify(checkboxState));
+                localStorage.setItem('theme', body.dataset.theme);
+                localStorage.setItem('isSoundOn', isSoundOn);
+
+                // Save accordion states
+                const accordionStates = {};
+                document.querySelectorAll('details.block-accordion').forEach(details => {
+                    accordionStates[details.dataset.block] = details.open;
+                });
+                localStorage.setItem('accordionStates', JSON.stringify(accordionStates));
+            };
+
+            // Helper functions for nested course checkboxes state
+            const saveCourseCheckboxState = (id, checked) => {
+                let courseStates = JSON.parse(localStorage.getItem('courseCheckboxesState') || '{}');
+                courseStates[id] = checked;
+                localStorage.setItem('courseCheckboxesState', JSON.stringify(courseStates));
+            };
+
+            const loadCourseCheckboxState = (id) => {
+                let courseStates = JSON.parse(localStorage.getItem('courseCheckboxesState') || '{}');
+                return courseStates[id] || false;
+            };
+
+            /**
+             * Loads the state of checkboxes, theme, sound, and accordions from localStorage and updates the interface.
+             */
+            const loadState = () => {
+                const savedCheckboxState = JSON.parse(localStorage.getItem('skillTrackerState'));
+                if (savedCheckboxState) {
+                    checkboxes.forEach(checkbox => {
+                        if (savedCheckboxState[checkbox.id] !== undefined) {
+                            checkbox.checked = savedCheckboxState[checkbox.id];
+                        }
+                    });
+                }
+
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                setTheme(savedTheme);
+
+                isSoundOn = localStorage.getItem('isSoundOn') === 'true';
+                updateSoundToggleButton();
+
+                const savedAccordionStates = JSON.parse(localStorage.getItem('accordionStates'));
+                if (savedAccordionStates) {
+                    document.querySelectorAll('details.block-accordion').forEach(details => {
+                        details.open = savedAccordionStates[details.dataset.block] || false;
+                    });
+                } else {
+                    // Default: open the first block if no saved state
+                    const firstBlock = document.querySelector('details.block-accordion');
+                    if (firstBlock) firstBlock.open = true;
+                }
+
+
+                for (const blockId in blocks) {
+                    updateProgress(blockId);
+                }
+            };
+
+            /**
+             * Sets the application theme (light or dark).
+             * @param {string} theme - The theme to apply ('light' or 'dark').
+             */
+            const setTheme = (theme) => {
+                body.dataset.theme = theme;
+                if (theme === 'dark') {
+                    themeIcon.textContent = '🌙';
+                    themeText.textContent = 'Mode Jour';
+                } else {
+                    themeIcon.textContent = '☀️';
+                    themeText.textContent = 'Mode Nuit';
+                }
+                saveState();
+            };
+
+            /**
+             * Updates the sound button icon and text.
+             */
+            const updateSoundToggleButton = () => {
+                if (isSoundOn) {
+                    soundIcon.textContent = '🔊';
+                    soundText.textContent = 'Son ON';
+                } else {
+                    soundIcon.textContent = '🔇';
+                    soundText.textContent = 'Son OFF';
+                }
+                saveState();
+            };
+
+            // Event listeners for main skill checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', (event) => {
+                    const blockId = event.target.closest('details.block-accordion').dataset.block;
+                    updateProgress(blockId);
+                    playClickSound();
+                    saveState();
+                });
+
+                const label = checkbox.nextElementSibling;
+                if (label) {
+                    label.addEventListener('click', () => {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                }
+            });
+
+            // Handle theme toggle button
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = body.dataset.theme;
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+            });
+
+            // Handle sound toggle button
+            soundToggle.addEventListener('click', () => {
+                isSoundOn = !isSoundOn;
+                updateSoundToggleButton();
+            });
+
+            // Handle print button
+            printButton.addEventListener('click', () => {
+                window.print();
+            });
+
+            // Handle reset button
+            document.getElementById('reset-button').addEventListener('click', () => {
+                if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les compétences ? Cela effacera votre progression sauvegardée.')) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    localStorage.clear();
+                    setTheme('light');
+                    isSoundOn = true;
+                    updateSoundToggleButton();
+                    for (const blockId in blocks) {
+                        updateProgress(blockId);
+                    }
+                    // Hide all skill details after reset
+                    document.querySelectorAll('.skill-details').forEach(detailDiv => {
+                        detailDiv.classList.add('hidden');
+                        const toggleButton = detailDiv.previousElementSibling;
+                        if (toggleButton && toggleButton.classList.contains('details-toggle')) {
+                            toggleButton.classList.remove('active');
+                        }
+                    });
+                    // Close all accordions except the first one on reset
+                    document.querySelectorAll('details.block-accordion').forEach((details, index) => {
+                        details.open = (index === 0);
+                    });
+                    saveState(); // Save the reset accordion state
+                }
+            });
+
+            // Handle individual skill details toggle buttons
+            document.querySelectorAll('.details-toggle').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const skillItem = event.target.closest('.skill-item');
+                    const skillId = skillItem.dataset.skillId;
+                    const detailsDiv = skillItem.querySelector('.skill-details');
+
+                    const isHidden = detailsDiv.classList.contains('hidden');
+                    if (isHidden) {
+                        if (detailsDiv.innerHTML === '' || detailsDiv.dataset.loadedCourses !== skillId) {
+                            const courses = courseMapping[skillId] || [];
+                            let html = '<p class="font-bold mb-2">Cours suggérés pour cette compétence :</p><ul class="list-disc pl-5">';
+                            if (courses.length > 0) {
+                                courses.forEach(course => {
+                                    const courseCheckboxId = `course-${skillId}-${course}`;
+                                    html += `<li class="course-item"><input type="checkbox" id="${courseCheckboxId}" class="h-4 w-4 text-gray-600 rounded focus:ring-gray-500 cursor-pointer"><label for="${courseCheckboxId}">${getFullCourseName(course)}</label></li>`;
+                                });
+                            } else {
+                                html += '<li>Aucun cours spécifique trouvé pour cette compétence.</li>';
+                            }
+                            html += '</ul>';
+
+                            if (detailsDiv.dataset.hasFoundational !== 'true') {
+                                let foundationalHtml = '<p class="font-bold mt-4 mb-2">Cours fondamentaux généraux :</p><ul class="list-disc pl-5">';
+                                foundationalCourses.forEach(course => {
+                                    const courseCheckboxId = `foundational-course-${course}`;
+                                    foundationalHtml += `<li class="course-item"><input type="checkbox" id="${courseCheckboxId}" class="h-4 w-4 text-gray-600 rounded focus:ring-gray-500 cursor-pointer"><label for="${courseCheckboxId}">${getFullCourseName(course)}</label></li>`;
+                                });
+                                foundationalHtml += '</ul>';
+                                html += foundationalHtml;
+                                detailsDiv.dataset.hasFoundational = 'true';
+                            }
+
+                            detailsDiv.innerHTML = html;
+                            detailsDiv.dataset.loadedCourses = skillId;
+
+                            // Attach event listeners and load state for new checkboxes
+                            detailsDiv.querySelectorAll('input[type="checkbox"]').forEach(courseCheckbox => {
+                                courseCheckbox.addEventListener('change', () => {
+                                    saveCourseCheckboxState(courseCheckbox.id, courseCheckbox.checked);
+                                    playClickSound();
+                                });
+                                courseCheckbox.checked = loadCourseCheckboxState(courseCheckbox.id);
+
+                                const label = courseCheckbox.nextElementSibling;
+                                if (label) {
+                                    label.addEventListener('click', (e) => {
+                                        e.stopPropagation();
+                                        courseCheckbox.checked = !courseCheckbox.checked;
+                                        courseCheckbox.dispatchEvent(new Event('change'));
+                                    });
+                                }
+                            });
+                        }
+                        detailsDiv.classList.remove('hidden');
+                        button.classList.add('active');
+                    } else {
+                        detailsDiv.classList.add('hidden');
+                        button.classList.remove('active');
+                    }
+                });
+            });
+
+            // Accordion toggle behavior: close others when one opens
+            document.querySelectorAll('details.block-accordion').forEach(detailsElement => {
+                detailsElement.addEventListener('toggle', (event) => {
+                    if (event.target.open) {
+                        document.querySelectorAll('details.block-accordion').forEach(otherDetails => {
+                            if (otherDetails !== event.target && otherDetails.open) {
+                                otherDetails.open = false;
+                            }
+                        });
+                    }
+                    saveState(); // Save state when an accordion opens/closes
+                });
+            });
+
+            loadState();
+        });
+    </script>
+</body>
+</html>
