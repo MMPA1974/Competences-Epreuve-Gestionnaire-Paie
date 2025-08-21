@@ -37,13 +37,15 @@
         body[data-theme="light"] .text-gray-700 {
             color: #4b5563;
         }
-        /* Light Mode - Control Buttons vibrant colors */
-        body[data-theme="light"] #theme-toggle { background-color: #EC4899; } /* Fuchsia-500 */
-        body[data-theme="light"] #theme-toggle:hover { background-color: #DB2777; } /* Fuchsia-600 */
-        body[data-theme="light"] #sound-toggle { background-color: #F97316; } /* Orange-500 */
-        body[data-theme="light"] #sound-toggle:hover { background-color: #EA580C; } /* Orange-600 */
-        body[data-theme="light"] #print-button { background-color: #3B82F6; } /* Blue-500 */
-        body[data-theme="light"] #print-button:hover { background-color: #2563EB; } /* Blue-600 */
+        /* Light Mode - Control Buttons vibrant colors (reverted for theme, sound, print) */
+        body[data-theme="light"] .control-button.primary-action { background-color: #EC4899; } /* Fuchsia-500 */
+        body[data-theme="light"] .control-button.primary-action:hover { background-color: #DB2777; } /* Fuchsia-600 */
+        body[data-theme="light"] .control-button.secondary-action { background-color: #F97316; } /* Orange-500 */
+        body[data-theme="light"] .control-button.secondary-action:hover { background-color: #EA580C; } /* Orange-600 */
+        body[data-theme="light"] .control-button.tertiary-action { background-color: #3B82F6; } /* Blue-500 */
+        body[data-theme="light"] .control-button.tertiary-action:hover { background-color: #2563EB; } /* Blue-600 */
+
+        /* WhatsApp and Discord colors (kept vibrant) */
         body[data-theme="light"] .whatsapp-button { background-color: #25D366; } /* WhatsApp Green */
         body[data-theme="light"] .whatsapp-button:hover { background-color: #1DA851; }
         body[data-theme="light"] .discord-button { background-color: #7289DA; } /* Discord Purple */
@@ -84,17 +86,19 @@
         body[data-theme="dark"] .text-gray-900 {
             color: #f7fafc;
         }
-        /* Dark Mode - Control Buttons colors (darker shades for harmony) */
-        body[data-theme="dark"] #theme-toggle { background-color: #C026D3; } /* Purple-600 (vibrant fuchsia) */
-        body[data-theme="dark"] #theme-toggle:hover { background-color: #A21CAF; } /* Purple-700 */
-        body[data-theme="dark"] #sound-toggle { background-color: #F59E0B; } /* Amber-500 (brighter orange) */
-        body[data-theme="dark"] #sound-toggle:hover { background-color: #D97706; } /* Amber-600 */
-        body[data-theme="dark"] #print-button { background-color: #60A5FA; } /* Blue-400 (brighter blue) */
-        body[data-theme="dark"] #print-button:hover { background-color: #3B82F6; } /* Blue-500 */
-        body[data-theme="dark"] .whatsapp-button { background-color: #22C55E; } /* Green-500 (vibrant green) */
-        body[data-theme="dark"] .whatsapp-button:hover { background-color: #16A34A; } /* Green-600 */
-        body[data-theme="dark"] .discord-button { background-color: #8B5CF6; } /* Violet-500 (vibrant purple) */
-        body[data-theme="dark"] .discord-button:hover { background-color: #7C3AED; } /* Violet-600 */
+        /* Dark Mode - Control Buttons colors (reverted for theme, sound, print) */
+        body[data-theme="dark"] .control-button.primary-action { background-color: #831843; } /* Fuchsia-700 */
+        body[data-theme="dark"] .control-button.primary-action:hover { background-color: #6C0E2F; }
+        body[data-theme="dark"] .control-button.secondary-action { background-color: #C2410C; } /* Orange-700 */
+        body[data-theme="dark"] .control-button.secondary-action:hover { background-color: #9A3412; }
+        body[data-theme="dark"] .control-button.tertiary-action { background-color: #1D4ED8; } /* Blue-700 */
+        body[data-theme="dark"] .control-button.tertiary-action:hover { background-color: #1E40AF; }
+        
+        /* WhatsApp and Discord colors (kept vibrant) */
+        body[data-theme="dark"] .whatsapp-button { background-color: #22C55E; } /* Green-500 */
+        body[data-theme="dark"] .whatsapp-button:hover { background-color: #16A34A; }
+        body[data-theme="dark"] .discord-button { background-color: #8B5CF6; } /* Violet-500 */
+        body[data-theme="dark"] .discord-button:hover { background-color: #7C3AED; }
         /* Dark Mode - Alert Box specific colors */
         body[data-theme="dark"] .alert-box {
             background-color: #7c2d12;
@@ -375,14 +379,7 @@
     <div class="container shadow-lg rounded-xl overflow-hidden p-6 md:p-8">
 
         <div class="control-buttons">
-            <button id="theme-toggle" class="control-button rounded-pill">
-                <span id="theme-icon">☀️</span>
-                <span id="theme-text">Mode Nuit</span>
-            </button>
-            <button id="sound-toggle" class="control-button rounded-pill">
-                <span id="sound-icon">🔊</span>
-                <span id="sound-text">Son ON</span>
-            </button>
+            <!-- WhatsApp and Discord at the top with distinct rectangular shape -->
             <a href="https://chat.whatsapp.com/EtV0ux5ipAG5JDhopzo0ut" target="_blank" rel="noopener noreferrer" class="control-button whatsapp-button rounded-rect">
                 <span>💬</span>
                 <span>WhatsApp</span>
@@ -391,7 +388,18 @@
                 <span>🎮</span>
                 <span>Discord</span>
             </a>
-            <button id="print-button" class="control-button rounded-pill">
+        </div>
+        <div class="control-buttons mt-4"> <!-- Separated for visual distinction -->
+            <!-- Other control buttons below with rounded-pill shape -->
+            <button id="theme-toggle" class="control-button primary-action rounded-pill">
+                <span id="theme-icon">☀️</span>
+                <span id="theme-text">Mode Nuit</span>
+            </button>
+            <button id="sound-toggle" class="control-button secondary-action rounded-pill">
+                <span id="sound-icon">🔊</span>
+                <span id="sound-text">Son ON</span>
+            </button>
+            <button id="print-button" class="control-button tertiary-action rounded-pill">
                 <span>🖨️</span>
                 <span>Imprimer</span>
             </button>
